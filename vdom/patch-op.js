@@ -40,7 +40,9 @@ function applyPatch(vpatch, domNode, renderOptions) {
 function removeNode(domNode, vNode) {
     var parentNode = domNode.parentNode
 
-    if (parentNode) {
+    if (typeof vNode.onRemove === 'function') {
+        vNode.onRemove(parentNode, domNode)
+    } else if (parentNode) {
         parentNode.removeChild(domNode)
     }
 
@@ -51,9 +53,11 @@ function removeNode(domNode, vNode) {
 
 function insertNode(parentNode, vNode, renderOptions) {
     var newNode = renderOptions.render(vNode, renderOptions)
-
-    if (parentNode) {
-        parentNode.appendChild(newNode)
+    
+    if (typeof vNode.onInsert === 'function') {
+        vNode.onInsert(parentNode, newNode)
+    } else if (parentNode) {
+        parentNode.appendChild(newNode)  
     }
 
     return parentNode
