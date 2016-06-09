@@ -41,7 +41,16 @@ function removeNode(domNode, vNode) {
     var parentNode = domNode.parentNode
 
     if (parentNode) {
-        parentNode.removeChild(domNode)
+        if (vNode.transition) {
+            // extend dom for performance reasons :/
+            domNode.isLeaving = true
+            domNode.classList.add(vNode.transition.leaveClass || "leave")
+            setTimeout(function () {
+                parentNode.removeChild(domNode)
+            }, typeof vNode.transition !== "object" ? vNode.transition : vNode.transition.duration || 1000)
+        } else {
+            parentNode.removeChild(domNode)
+        }
     }
 
     destroyWidget(domNode, vNode);
@@ -53,7 +62,14 @@ function insertNode(parentNode, vNode, renderOptions) {
     var newNode = renderOptions.render(vNode, renderOptions)
 
     if (parentNode) {
-        parentNode.appendChild(newNode)
+        if (vNode.transition) {
+            newNode.classList.add(vNode.enterClass || "enter")
+            // TODO: could we use `nextTick` instead
+            setTimeout(function () {
+                newNode.classList.remove(vNode.enterClass || "enter")
+            }, 10)
+        }
+        parentNode.appendChild(newNode)  
     }
 
     return parentNode

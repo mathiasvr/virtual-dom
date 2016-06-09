@@ -32,7 +32,7 @@ function recurse(rootNode, tree, indices, nodes, rootIndex) {
 
             var childNodes = rootNode.childNodes
 
-            for (var i = 0; i < tree.children.length; i++) {
+            for (var i = 0, j = 0; i < tree.children.length; i++, j++) {
                 rootIndex += 1
 
                 var vChild = vChildren[i] || noChild
@@ -40,7 +40,9 @@ function recurse(rootNode, tree, indices, nodes, rootIndex) {
 
                 // skip recursion down the tree if there are no nodes down here
                 if (indexInRange(indices, rootIndex, nextIndex)) {
-                    recurse(childNodes[i], vChild, indices, nodes, rootIndex)
+                    // skip dom nodes with delayed removal
+                    while(childNodes[j] && childNodes[j].isLeaving) j++
+                    recurse(childNodes[j], vChild, indices, nodes, rootIndex)
                 }
 
                 rootIndex = nextIndex
